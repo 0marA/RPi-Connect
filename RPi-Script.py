@@ -15,13 +15,22 @@ celloLamp.set_version(3.3)
 chargingStationLamp.set_version(3.1)
 bedsideLamp.set_version(3.1)
 
+lampsOn = False
 while True:
     if GPIO.input(18) == True:
-        celloLamp.set_status(not celloLamp.status()['dps']['1'])
-        chargingStationLamp.set_status(not chargingStationLamp.status()['dps']['1'])
-        bedsideLamp.set_status(not bedsideLamp.status()['dps']['1'])
-        print("HIGH")
-        GPIO.output(23, GPIO.HIGH)
-        time.sleep(.5)
-    print("LOW")
-    GPIO.output(23, GPIO.LOW)
+        if (lampsOn):
+            celloLamp.turn_on()
+            chargingStationLamp.turn_on()
+            bedsideLamp.turn_on()
+            print("Turned on")
+            GPIO.output(23, GPIO.HIGH)
+            time.sleep(.5)
+            GPIO.output(23, GPIO.LOW)
+        else:
+            celloLamp.turn_off()
+            chargingStationLamp.turn_off()
+            bedsideLamp.turn_off()
+            print("Turned off")
+            GPIO.output(23, GPIO.HIGH)
+            time.sleep(.5)
+            GPIO.output(23, GPIO.LOW)

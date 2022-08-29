@@ -7,8 +7,12 @@ bedsideLamp = tinytuya.OutletDevice(BEDSIDE_LAMPS_DEVICE_ID, BEDSIDE_LAMPS_IP, B
 
 celloLamp.set_version(3.3)
 chargingStationLamp.set_version(3.1)
-bedsideLamp.set_version(3.1)
+bedsideLamp.set_version(3.3)
 
-celloLamp.set_status(not celloLamp.status()['dps']['1'])
-chargingStationLamp.set_status(not chargingStationLamp.status()['dps']['1'])
-bedsideLamp.set_status(not bedsideLamp.status()['dps']['1'])
+#celloLamp.set_status(not celloLamp.status()['dps']['1'])
+#chargingStationLamp.set_status(not chargingStationLamp.status()['dps']['1'])
+#bedsideLamp.set_status(not bedsideLamp.status()['dps']['1'])
+
+celloLamp.turn_on()
+chargingStationLamp.turn_on()
+bedsideLamp.turn_on()
