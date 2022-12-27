@@ -1,6 +1,2 @@
 __pycache__
-devices.json
-secrets.py
-snapshot.json
-tinytuya.json
-tuya-raw.json
+keys.py
