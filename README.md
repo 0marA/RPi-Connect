@@ -1,13 +1,24 @@
 # RPi-Tuya-Control
 
-Project based on the Tuya IOT API and a c̶u̶s̶t̶o̶m̶ ̶R̶a̶s̶p̶b̶e̶r̶r̶y̶ ̶P̶i̶ ̶s̶e̶n̶s̶o̶r̶ ̶t̶o̶ ̶a̶u̶t̶o̶m̶a̶t̶i̶c̶a̶l̶l̶y̶ ̶t̶u̶r̶n̶ ̶o̶n̶ ̶t̶h̶e̶ ̶t̶u̶y̶a̶ ̶s̶m̶a̶r̶t̶ ̶l̶a̶m̶p̶s̶ ̶i̶n̶ ̶m̶y̶ ̶r̶o̶o̶m̶ ̶w̶h̶e̶n̶ ̶I̶ ̶w̶a̶l̶k̶ ̶i̶n̶.̶ button to turn on my smart outlet controlled lamps.
+![Device](./device.png)
 
-## Setup
+Project based on the Tuya IOT API to turn on smart outlet controlled devices with a push button and an OLED.
+
+## Web Setup
 
 First, follow the [guide](https://developer.tuya.com/en/demo/python-iot-development-practice) to create an IOT project on a Tuya Devoloper account, then replace the device IDs and secret keys with the ones generated for you by Tuya.
 
+## Hardware
 
-### Hardware
+Download and 3D Print the CAD from my [Thingiverse](https://www.thingiverse.com/theengineermachine/designs)
 
-Wire a push button to the 3.3V and GPIO 18 pin, and then an led to a GND pin and GPIO 23. Now configure crontab by running `crontab -e` and add
+Wire a push button to the 3.3V and GPIO 18 pin and wire the OLED SCK, SDA, VCC, and GND to the according Raspberry Pi's GPIO pins.
+
+Glue the OLED into place so it's aligned with the screen hole. The mechanical keyswitch should click into place.
+
+## Raspberry Pi Setup
+
+Type `sudo raspi-config` into the terminal and enable the I2C Interface and then reboot the Pi.
+
+Add the script to the Raspberry Pi's desktop and then configure crontab by running `crontab -e` and add
 `@reboot python /home/pi/*path/to/file.py*`.
