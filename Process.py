@@ -54,6 +54,7 @@ openapi.connect()
 
 setLamps = False
 pixelStatus = True
+autoPixelStatus = False
   
 def setValue(value):
     CL_commands = {'commands': [{'code': 'switch_1', 'value': value}]}
@@ -82,11 +83,10 @@ def colorWipe(strip, color, wait_ms=50):
 
 while True:
     if GPIO.input(12) == True:
-        apiRequest = openapi.get("/v1.0/iot-03/devices/{}/status".format(CS_LAMP_ID))
-
-        
+        time.sleep(.3)
         if GPIO.input(12) == True:
             pixelStatus = not pixelStatus
+            setPixels(pixelStatus)
             
             draw.rectangle((0,0,width,height), outline=0, fill=0)
             draw.text((x+10, top + 16), "Successfully Turned", font=font, fill=255)
@@ -101,14 +101,18 @@ while True:
         else:
             openapi = TuyaOpenAPI(API_ENDPOINT, ACCESS_ID, ACCESS_KEY)
             openapi.connect()
+            apiRequest = openapi.get("/v1.0/iot-03/devices/{}/status".format(CS_LAMP_ID))
             
             if apiRequest["result"][0]["value"] == True:
                 setLamps = False
             else:
                 setLamps = True
+                
+            xDist = 7 if setLamps else 5
+                
             draw.rectangle((0,0,width,height), outline=0, fill=0)
             draw.text((x+10, top + 16), "Successfully Turned",  font=font, fill=255)
-            draw.text((x+8, top+24), getStringValue(setLamps) + " Omar's Room Lamps", font=font, fill=255)
+            draw.text((x+xDist, top+24), getStringValue(setLamps) + " Omar's Room Lamps", font=font, fill=255)
             
             setValue(setLamps)
 
@@ -118,10 +122,13 @@ while True:
             disp.clear()
             disp.display()
             
-    if GPIO.input(15) == True and pixelStatus == False:
+    elif GPIO.input(15) == True and autoPixelStatus == True and not pixelStatus:
         setPixels(False)
-    else:
+        autoPixelStatus = False
+    elif GPIO.input(15) == False and autoPixelStatus == False:
         setPixels(True)
+        autoPixelStatus = True
+
             
 
      
