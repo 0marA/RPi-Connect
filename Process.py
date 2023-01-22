@@ -9,7 +9,7 @@ from PIL import ImageDraw
 from PIL import ImageFont
 from rpi_ws281x import *
 
-LED_COUNT      = 30     # Number of LED pixels.
+LED_COUNT      = 30      # Number of LED pixels.
 LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 10      # DMA channel to use for generating a signal (try 10)
@@ -18,7 +18,6 @@ LED_INVERT     = False   # True to invert the signal (when using NPN transistor 
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 pixels = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
-    # Intialize the library (must be called once before other functions).
 pixels.begin()
 
 RST = None
@@ -47,15 +46,14 @@ font = ImageFont.load_default()
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(12, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(23, GPIO.OUT)
+GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
 
 openapi = TuyaOpenAPI(API_ENDPOINT, ACCESS_ID, ACCESS_KEY)
 openapi.connect()
 
 setLamps = False
 pixelStatus = True
-
-CSL_STATUS = openapi.get("/v1.0/iot-03/devices/{}/status".format(CS_LAMP_ID))["result"][0]["value"]
   
 def setValue(value):
     CL_commands = {'commands': [{'code': 'switch_1', 'value': value}]}
@@ -71,31 +69,28 @@ def getStringValue(value):
 
 def setPixels(pixelStatus):
     if pixelStatus:
-        colorWipe(pixels, Color(255, 255, 255))  # Red wipe
+        colorWipe(pixels, Color(255, 255, 255))
     else:
-        colorWipe(pixels, Color(0, 0, 0))  # Red wipe
+        colorWipe(pixels, Color(0, 0, 0))
         
-    
-    
 
 def colorWipe(strip, color, wait_ms=50):
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
         strip.show()
-        time.sleep(wait_ms/1000.0)
+        time.sleep(wait_ms/2000.0)
 
 while True:
     if GPIO.input(12) == True:
-        time.sleep(0.5)
+        apiRequest = openapi.get("/v1.0/iot-03/devices/{}/status".format(CS_LAMP_ID))
+
         
         if GPIO.input(12) == True:
             pixelStatus = not pixelStatus
-            setPixels(pixelStatus)
-            
             
             draw.rectangle((0,0,width,height), outline=0, fill=0)
-            draw.text((x+10, top + 16),       "Successfully Turned",  font=font, fill=255)
-            draw.text((x+20, top+24),     getStringValue(pixelStatus) + " Watch Light", font=font, fill=255)
+            draw.text((x+10, top + 16), "Successfully Turned", font=font, fill=255)
+            draw.text((x+20, top+24), getStringValue(pixelStatus) + " Watch Light", font=font, fill=255)
             
             disp.image(image)
             disp.display()
@@ -107,14 +102,13 @@ while True:
             openapi = TuyaOpenAPI(API_ENDPOINT, ACCESS_ID, ACCESS_KEY)
             openapi.connect()
             
-            if openapi.get("/v1.0/iot-03/devices/{}/status".format(CS_LAMP_ID))["result"][0]["value"] == True:
+            if apiRequest["result"][0]["value"] == True:
                 setLamps = False
             else:
                 setLamps = True
-                
             draw.rectangle((0,0,width,height), outline=0, fill=0)
-            draw.text((x+10, top + 16),       "Successfully Turned",  font=font, fill=255)
-            draw.text((x+8, top+24),     getStringValue(setLamps) + " Omar's Room Lamps", font=font, fill=255)
+            draw.text((x+10, top + 16), "Successfully Turned",  font=font, fill=255)
+            draw.text((x+8, top+24), getStringValue(setLamps) + " Omar's Room Lamps", font=font, fill=255)
             
             setValue(setLamps)
 
@@ -123,6 +117,16 @@ while True:
             time.sleep(3)
             disp.clear()
             disp.display()
+            
+    if GPIO.input(15) == True and pixelStatus == False:
+        setPixels(False)
+    else:
+        setPixels(True)
+            
+
+     
+        
+        
            
 
        
